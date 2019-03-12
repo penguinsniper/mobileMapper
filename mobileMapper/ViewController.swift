@@ -8,9 +8,9 @@
 
 import UIKit
 import MapKit
-//import CoreLocation
-class ViewController: UIViewController, CLLocationManagerDelegate {
-
+//import CoreLocation                                               here
+class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
+    
     @IBOutlet weak var MapView: MKMapView!
     let locationManager = CLLocationManager()
     var parks: [MKMapItem] = []
@@ -22,10 +22,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+        //here
+        MapView.delegate = self
+        
     }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations[0]
+    //here
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        print("here")
+        if annotation.isEqual(mapView.userLocation){
+         return nil
+        }
+    
+        let pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
+        pin.canShowCallout = true
+        return pin
+        
     }
     @IBAction func searchButton(_ sender: UIBarButtonItem) {
         let request = MKLocalSearch.Request()
@@ -34,10 +45,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         request.region = MKCoordinateRegion(center: currentLocation.coordinate, span: span)
         let search = MKLocalSearch(request: request)
         search.start { (response, error) in
-            <#code#>
+            //print(response)
+            guard let response = response else { return }
+            for mapItem in response.mapItems {
+                self.parks.append(mapItem)
+                let annotation = MKPointAnnotation()
+                annotation.title = mapItem.name
+                annotation.coordinate = mapItem.placemark.coordinate
+                self.MapView.addAnnotation(annotation)
+            }
+            
         }
-        
-        
+    }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]){
+        currentLocation = locations[0]
         
     }
     @IBAction func zoomButton(_ sender: UIBarButtonItem) {
@@ -48,4 +69,5 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
 }
+
 
