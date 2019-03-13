@@ -1,7 +1,6 @@
 //
 //  ViewController.swift
 //  mobileMapper
-//reeeeeeeee
 //  Created by Ryan Lau on 3/6/19.
 //  Copyright © 2019 John Hersey High School. All rights reserved.
 //
@@ -28,14 +27,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     }
     //here
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        print("here")
+        //print("here")
         if annotation.isEqual(mapView.userLocation){
-         return nil
+            return nil
         }
-    
+        
         let pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
         pin.canShowCallout = true
+        let button = UIButton(type: .detailDisclosure)
+        pin.rightCalloutAccessoryView = button
         return pin
+    }
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        var currentMapItem = MKMapItem()
+        if let title = view.annotation?.title, let parkName = title{
+        for mapItem in parks{
+            if mapItem.name == parkName{
+                currentMapItem = mapItem
+            }
+            
+        }
+        }
+        let placemark = currentMapItem.placemark
+        print(placemark)
         
     }
     @IBAction func searchButton(_ sender: UIBarButtonItem) {
@@ -69,5 +83,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     }
     
 }
+
 
 
